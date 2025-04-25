@@ -1,0 +1,7 @@
+{
+    "param1": "value1",
+    "dbname": "mydb",
+    "host": "db-proj-db-1",
+    "user": "postgres",
+}
+

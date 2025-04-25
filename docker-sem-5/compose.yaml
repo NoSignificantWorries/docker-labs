@@ -10,6 +10,14 @@ services:
       - "8000:8000"
     networks:
       - db-net
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    configs:
+      - app-conf
+    secrets:
+      - dbpass
 
   db:
     image: postgres:17.4
@@ -20,17 +28,28 @@ services:
       - db-vol:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=/run/secrets/dbpass
+      - POSTGRES_PASSWORD_FILE=/run/secrets/dbpass
     secrets:
       - dbpass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 15
+      start_period: 30s
+      timeout: 10s
+
 
 secrets:
   dbpass:
     file: db/db_pass.txt
 
+configs:
+  app-conf:
+    file: configs/app_config.json
+
 volumes:
   db-vol:
-    name: db-vol-name
+    name: vol-sem-5
 
 networks:
   db-net:
