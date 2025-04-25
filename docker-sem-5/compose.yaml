@@ -1,0 +1,37 @@
+name: db-proj
+
+services:
+  web:
+    build:
+      context: flask
+      target: builder
+    stop_signal: SIGINT
+    ports:
+      - "8000:8000"
+    networks:
+      - db-net
+
+  db:
+    image: postgres:17.4
+    restart: always
+    networks:
+      - db-net
+    volumes:
+      - db-vol:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=/run/secrets/dbpass
+    secrets:
+      - dbpass
+
+secrets:
+  dbpass:
+    file: db/db_pass.txt
+
+volumes:
+  db-vol:
+    name: db-vol-name
+
+networks:
+  db-net:
+

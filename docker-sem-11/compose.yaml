@@ -1,0 +1,68 @@
+name: hw11
+
+services:
+  web:
+    image: nginx:1.27
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: app
+      target: builder
+    stop_signal: SIGINT
+    secrets:
+      - dbpass
+    ports:
+      - "5555:5555"
+    networks:
+      - backend
+      - db-net
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17.4
+    restart: always
+    volumes:
+      - db-vol:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/dbpass
+    secrets:
+      - dbpass
+    networks:
+      - db-net
+
+volumes:
+  db-vol:
+    name: hw11-db
+
+secrets:
+  dbpass:
+    file: db_pass.txt
+
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.0.0/16
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  db-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+

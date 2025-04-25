@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  python-test:
+    build:
+      context: .
+      dockerfile: MyDockerfile
+      args:
+        WORK_DIR: /home/test
+    image: nosignificantworries/python-test
+    stdin_open: true
+    tty: true
+    rm: true
+

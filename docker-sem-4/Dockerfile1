@@ -1,0 +1,8 @@
+ARG WORK_DIR=/home/app
+
+FROM alpine:3.21.3
+
+ARG WORK_DIR
+ENV WORK_DIR=${WORK_DIR}
+WORKDIR ${WORK_DIR}
+

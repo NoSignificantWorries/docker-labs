@@ -1,0 +1,12 @@
+ARG WORK_DIR=/home/app
+
+FROM debian:bookworm-slim
+
+RUN apt update -y
+RUN apt install -y vim
+
+ARG WORK_DIR
+ENV WORK_DIR=${WORK_DIR}
+
+WORKDIR ${WORK_DIR}
+

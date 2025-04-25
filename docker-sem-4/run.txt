@@ -1,0 +1,5 @@
+docker run --rm -it -v vol1:/home/vol:ro nosignificantworries/volume1:test sh
+docker run --rm -it --mount type=volume,src=vol1,dst=/home/volumes/vol/subdir,volume-subpath=subdir2 nosignificantworries/volume2:test bash
+
+docker run --rm -it -v vol1:/home/vol1:ro -v vol2:/home/vol2 nosignificantworries/volume1:test sh
+

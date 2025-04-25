@@ -1,0 +1,10 @@
+__pycache__/
+.vscode/
+.devcontainer/
+.dockerignore/
+docker-compose.yml
+env.conf
+MyDockerfile1
+MyDockerfile2
+Dockerfile
+

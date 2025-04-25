@@ -1,0 +1,30 @@
+FROM alpine:3.21.3 AS builder
+
+RUN apk update && apk add --no-cache build-base zlib-dev bzip2-dev libffi-dev openssl-dev
+
+RUN wget https://www.python.org/ftp/python/3.12.9/Python-3.12.9.tgz && \
+    tar -xzf Python-3.12.9.tgz && \
+    cd Python-3.12.9 && \
+    ./configure --enable-optimizations && \
+    make -j $(nproc) && \
+    make install
+
+FROM alpine:3.21.3
+
+COPY --from=builder /usr/local/bin/python3 /usr/local/bin/python3
+COPY --from=builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
+COPY --from=builder /usr/local/bin/pip3 /usr/local/bin/pip3
+
+ENV PATH="/usr/local/bin:${PATH}"
+
+ARG WORK_DIR=/home/app
+
+ENV MY_WORK_DIR=$WORK_DIR
+
+WORKDIR $WORK_DIR
+
+COPY . .
+
+ENTRYPOINT ["python3", "main.py"]
+
+
