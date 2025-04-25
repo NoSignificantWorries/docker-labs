@@ -1,0 +1,88 @@
+name: hw11
+
+services:
+  web:
+    image: nginx:1.27
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: app
+      target: builder
+    stop_signal: SIGINT
+    configs:
+      - app-conf
+    secrets:
+      - dbpass
+    ports:
+      - "5555:5555"
+      - "5000:5555"
+      - "8006:5555"
+    networks:
+      - backend
+      - db-net
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  db:
+    image: mysql:9.3.0
+    restart: always
+    volumes:
+      - db-vol:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/rootpass
+      - MYSQL_USER=dmitry
+      - MYSQL_PASSWORD_FILE=/run/secrets/dbpass
+    secrets:
+      - dbpass
+      - rootpass
+    networks:
+      - db-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  db-vol:
+    name: hw11-db
+
+secrets:
+  dbpass:
+    file: db_pass.txt
+  rootpass:
+    file: root_pass.txt
+
+configs:
+  app-conf:
+    file: configs/app_config.json
+
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.10.0.0/16
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  db-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+
