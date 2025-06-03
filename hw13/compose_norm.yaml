@@ -1,3 +1,5 @@
+name: hw13
+
 services:
   api:
     build:
@@ -14,8 +16,8 @@ services:
     networks:
       - backend
       - db-net
-    deploy:
-      replicas: 5
+    depends_on:
+      - db
 
   db:
     image: mysql:9.3.0
@@ -39,8 +41,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    deploy:
-      replicas: 1
+
 
 volumes:
   db-vol:
@@ -58,12 +59,12 @@ configs:
 
 networks:
   backend:
-    driver: overlay
+    driver: bridge
     ipam:
       config:
         - subnet: 172.10.0.0/16
   db-net:
-    driver: overlay
+    driver: bridge
     ipam:
       config:
         - subnet: 172.30.0.0/16
