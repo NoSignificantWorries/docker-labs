@@ -1,0 +1,7 @@
+USE mydb;
+
+CREATE TABLE IF NOT EXISTS data (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(256)
+);
+
