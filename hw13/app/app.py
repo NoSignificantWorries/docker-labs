@@ -33,8 +33,8 @@ def try_connect() -> bool:
 def get_data_from_db() -> list[dict]:
     global status, mycursor
 
-    if mycursor is None:
-        return [{}]
+    if mycursor is None or mydb is None:
+        return "Error while reading!", 500
 
     mycursor.execute("SELECT * FROM data")
     table = mycursor.fetchall()
